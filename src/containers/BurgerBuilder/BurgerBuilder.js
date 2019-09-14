@@ -4,6 +4,8 @@ import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
+import Spinner from '../../components/UI/Spinner/Spinner';
+import Api from '../../Api';
 
 const INGREDIENT_PRICES = {
   salad: 0.5,
@@ -23,19 +25,17 @@ class BurgerBuilder extends Component {
     },
     totalPrice: 4,
     purchasable: false,
-    purchasing: false
+    purchasing: false,
+    loading: false
   }
 
   render () {
     const disabledInfo = this.getDisabledInfo();
+    const modalContent = this.getModalContent();
     return (
       <React.Fragment>
         <Modal show={this.state.purchasing} clicked={this.purchaseCancelHandler}>
-          <OrderSummary
-            price={this.state.totalPrice}
-            ingredients={this.state.ingredients}
-            purchaseCanceled={this.purchaseCancelHandler}
-            purchaseContinued={this.purcharseContinueHandler} />
+          {modalContent}
         </Modal>
         <Burger ingredients={this.state.ingredients} />
         <BuildControls
@@ -46,6 +46,19 @@ class BurgerBuilder extends Component {
          price={this.state.totalPrice}
          purchasable={this.state.purchasable} />
       </React.Fragment>
+    );
+  }
+
+  getModalContent() {
+    if (this.state.loading) {
+      return <Spinner />;
+    }
+    return (
+      <OrderSummary
+        price={this.state.totalPrice}
+        ingredients={this.state.ingredients}
+        purchaseCanceled={this.purchaseCancelHandler}
+        purchaseContinued={this.purcharseContinueHandler} />
     );
   }
 
@@ -95,7 +108,30 @@ class BurgerBuilder extends Component {
   }
 
   purcharseContinueHandler = () => {
-    alert('You continue!');
+    this.setState({loading: true});
+    const order = {
+      ingredients: this.state.ingredients,
+      price: this.state.totalPrice,
+      customer: {
+        name: 'Arge',
+        address: {
+          street: 'street 1',
+          zipCode: 'zipCode 1',
+          country: 'Vnzla'
+        },
+        email: 'react@react.com'
+      },
+      deliveryMode: 'fastest'
+    };
+    Api.sendOrder(order)
+    .then(response => {
+      this.setState({loading: false, purchasing: false});
+      console.log(response);
+    })
+    .catch(error => {
+      this.setState({loading: false, purchasing: false});
+      console.log(error);
+    });
   }
 
 }
