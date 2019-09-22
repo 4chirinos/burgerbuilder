@@ -4,7 +4,6 @@ import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
-import Spinner from '../../components/UI/Spinner/Spinner';
 import Api from '../../Api';
 
 const INGREDIENT_PRICES = {
@@ -17,25 +16,33 @@ const INGREDIENT_PRICES = {
 class BurgerBuilder extends Component {
 
   state = {
-    ingredients: {
-      salad: 0,
-      bacon: 0,
-      cheese: 0,
-      meat: 0
-    },
+    ingredients: {},
     totalPrice: 4,
     purchasable: false,
     purchasing: false,
     loading: false
   }
 
+  componentDidMount() {
+    Api.getIngredients()
+    .then(ingredients => {
+      this.setState({ingredients});
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
+
   render () {
     const disabledInfo = this.getDisabledInfo();
-    const modalContent = this.getModalContent();
     return (
       <React.Fragment>
         <Modal show={this.state.purchasing} clicked={this.purchaseCancelHandler}>
-          {modalContent}
+          <OrderSummary
+            price={this.state.totalPrice}
+            ingredients={this.state.ingredients}
+            purchaseCanceled={this.purchaseCancelHandler}
+            purchaseContinued={this.purcharseContinueHandler} />
         </Modal>
         <Burger ingredients={this.state.ingredients} />
         <BuildControls
@@ -46,19 +53,6 @@ class BurgerBuilder extends Component {
          price={this.state.totalPrice}
          purchasable={this.state.purchasable} />
       </React.Fragment>
-    );
-  }
-
-  getModalContent() {
-    if (this.state.loading) {
-      return <Spinner />;
-    }
-    return (
-      <OrderSummary
-        price={this.state.totalPrice}
-        ingredients={this.state.ingredients}
-        purchaseCanceled={this.purchaseCancelHandler}
-        purchaseContinued={this.purcharseContinueHandler} />
     );
   }
 
@@ -108,29 +102,14 @@ class BurgerBuilder extends Component {
   }
 
   purcharseContinueHandler = () => {
-    this.setState({loading: true});
-    const order = {
-      ingredients: this.state.ingredients,
-      price: this.state.totalPrice,
-      customer: {
-        name: 'Arge',
-        address: {
-          street: 'street 1',
-          zipCode: 'zipCode 1',
-          country: 'Vnzla'
-        },
-        email: 'react@react.com'
-      },
-      deliveryMode: 'fastest'
-    };
-    Api.sendOrder(order)
-    .then(response => {
-      this.setState({loading: false, purchasing: false});
-      console.log(response);
-    })
-    .catch(error => {
-      this.setState({loading: false, purchasing: false});
-      console.log(error);
+    let queryString = Object
+      .keys(this.state.ingredients)
+      .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(this.state.ingredients[key]))
+      .join('&');
+    queryString = queryString.concat('&price=' + encodeURIComponent(this.state.totalPrice));
+    this.props.history.push({
+      pathname: '/checkout',
+      search: '?' + queryString
     });
   }
 

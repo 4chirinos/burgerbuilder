@@ -26,8 +26,7 @@ const buildControls = (props) => {
   );
 };
 
-const getControls = (props, controls) =>
-  controls.map(control => 
+const getControls = (props, controls) => controls.map(control => 
     <BuildControl
       key={control.label}
       label={control.label}

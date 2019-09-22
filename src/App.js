@@ -1,26 +1,23 @@
 import React, { Component } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { Route, Switch } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 
 import Layout from './components/Layout/Layout';
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
+import Checkout from './containers/Checkout/Checkout';
+import Orders from './containers/Orders/Orders';
 
 class App extends Component {
-
-  notify = () => {
-    toast("Default Notification !");
-    toast.success("Success Notification !", {
-      position: toast.POSITION.TOP_CENTER
-    });
-  };
 
   render() {
     return (
       <div>
-        <ToastContainer autoClose={2000} />
         <Layout>
-          <button onClick={this.notify}>Notify !</button>
-          <BurgerBuilder />
+          <Switch>
+            <Route path='/checkout' component={Checkout} />
+            <Route path='/orders' component={Orders} />
+            <Route path='/' component={BurgerBuilder} />
+          </Switch>
         </Layout>
       </div>
     );
