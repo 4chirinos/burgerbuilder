@@ -3,16 +3,18 @@ import React, { Component } from 'react';
 import classes from './ContactData.css';
 import Button from '../../../components/UI/Button/Button';
 import Spinner from '../../../components/UI/Spinner/Spinner';
+import Input from '../../../components/UI/Input/Input';
 import Api from '../../../Api';
 
 class ContactData extends Component {
 
-  state = {
-    name: '',
-    email: '',
-    address: {},
-    loading: false
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      formElements: this.getFormElements(),
+      loading: false
+    };
+  }
 
   render() {
 
@@ -20,14 +22,13 @@ class ContactData extends Component {
       return <Spinner />;
     }
 
+    const inputElements = this.getInputElements(this.state.formElements);
+
     return (
       <div className={classes.ContactData}>
         <h4>Enter your contact data</h4>
-        <form>
-          <input className={classes.Input} type='text' name='name' placeholder='your name'></input>
-          <input className={classes.Input} type='email' name='email' placeholder='your email'></input>
-          <input className={classes.Input} type='text' name='street' placeholder='your street'></input>
-          <input className={classes.Input} type='text' name='postal' placeholder='your postal'></input>
+        <form onSubmit={this.orderHandler}>
+          {inputElements}
           <Button btnType='Success' clicked={this.orderHandler}>ORDER</Button>
         </form>
       </div>
@@ -37,19 +38,11 @@ class ContactData extends Component {
   orderHandler = (event) => {
     event.preventDefault();
     this.setState({loading: true});
+    const contactData = this.getContactData();
     const order = {
       ingredients: this.props.ingredients,
       price: this.props.price,
-      customer: {
-        name: 'Arge',
-        address: {
-          street: 'street 1',
-          zipCode: 'zipCode 1',
-          country: 'Vnzla'
-        },
-        email: 'react@react.com'
-      },
-      deliveryMode: 'fastest'
+      contactData
     };
     Api.createOrder(order)
     .then(response => {
@@ -60,6 +53,99 @@ class ContactData extends Component {
       this.setState({loading: false});
       console.log(error);
     });
+  }
+
+  getContactData = () => {
+    const formElements = this.state.formElements;
+    return {
+      name: formElements.name.value,
+      street: formElements.street.value,
+      zipCode: formElements.zipCode.value,
+      country: formElements.country.value,
+      email: formElements.email.value,
+      deliveryMode: formElements.deliveryMode.value
+    };
+  }
+
+  inputChangedHandler = (event, inputIdentifier) => {
+    const updatedFormElements = {
+      ...this.state.formElements
+    };
+    const updatedInputElement = {
+      ...this.state.formElements[inputIdentifier]
+    };
+    updatedInputElement.value = event.target.value;
+    updatedFormElements[inputIdentifier] = updatedInputElement;
+    this.setState({formElements: updatedFormElements});
+  }
+
+  getInputElements = (formElements) => {
+    return Object
+    .keys(formElements)
+    .map(key => {
+      const element = formElements[key];
+      return <Input
+        key={key}
+        elementType={element.elementType}
+        elementConfig={element.elementConfig}
+        value={element.value}
+        changed={(event) => this.inputChangedHandler(event, key)} />;
+    });
+  }
+
+  getFormElements = () => {
+    return {
+      name: {
+        elementType: 'input',
+        elementConfig: {
+          type: 'text',
+          placeholder: 'Your name'
+        },
+        value: ''
+      },
+      street: {
+        elementType: 'input',
+        elementConfig: {
+          type: 'text',
+          placeholder: 'Street'
+        },
+        value: ''
+      },
+      zipCode: {
+        elementType: 'input',
+        elementConfig: {
+          type: 'text',
+          placeholder: 'ZIP Code'
+        },
+        value: ''
+      },
+      country: {
+        elementType: 'input',
+        elementConfig: {
+          type: 'text',
+          placeholder: 'Country'
+        },
+        value: ''
+      },
+      email: {
+        elementType: 'input',
+        elementConfig: {
+          type: 'email',
+          placeholder: 'Email'
+        },
+        value: ''
+      },
+      deliveryMode: {
+        elementType: 'select',
+        elementConfig: {
+          options: [
+            {value: 'Fastest', displayValue: 'Fastest'},
+            {value: 'Cheapest', displayValue: 'Cheapest'}
+          ]
+        },
+        value: ''
+      }
+    };
   }
 
 }
