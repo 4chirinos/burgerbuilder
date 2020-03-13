@@ -1,5 +1,5 @@
 import firebase from './config/axios/firebase';
-import constants from './constants';
+import constants from './constants/constants';
 
 class Api {
 
