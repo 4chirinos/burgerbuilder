@@ -18,7 +18,7 @@ class Checkout extends Component {
         <Route path={this.props.match.path + '/contact-data'} component={ContactData}></Route>
       </div>
     );
-    return Object.keys(this.props.ingredients).length ? summary : <Redirect to="/" />;
+    return Object.keys(this.props.ingredients).length === 0 || this.props.purchased ? <Redirect to="/" /> : summary;
   }
 
   checkoutContinueHandler = () => {
@@ -33,7 +33,8 @@ class Checkout extends Component {
 
 const mapStateToProps = state => {
   return {
-    ingredients: state.burgerBuilder.ingredients
+    ingredients: state.burgerBuilder.ingredients,
+    purchased: state.order.purchased
   };
 };
 

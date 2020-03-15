@@ -1,29 +1,20 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 import Order from '../../components/Order/Order';
 import Spinner from '../../components/UI/Spinner/Spinner';
-import Api from '../../Api';
+import * as actions from '../../store/actions';
 
 class Orders extends Component {
 
-  state = {
-    orders: [],
-    loading: true
-  };
-
   componentDidMount() {
     console.log('[Orders] component did mount');
-    Api.getOrders()
-    .then(orders => this.setState({orders, loading: false}))
-    .catch(error => {
-      this.setState({loading: false})
-      console.log(error)
-    });
+    this.props.onFetchOrders();
   }
 
   render() {
     
-    if (this.state.loading) {
+    if (this.props.loading) {
       return <Spinner />
     }
 
@@ -35,10 +26,23 @@ class Orders extends Component {
   }
 
   getOrders = () => {
-    return this.state.orders
+    return this.props.orders
       .map(order => <Order key={order.id} ingredients={order.ingredients} price={order.price} />);
   };
 
 }
 
-export default Orders;
+const mapStateToProps = state => {
+  return {
+    orders: state.order.orders,
+    loading: state.order.loading
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onFetchOrders: () => dispatch(actions.fetchOrders())
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Orders);

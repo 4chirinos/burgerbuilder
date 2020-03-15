@@ -6,7 +6,7 @@ class Api {
   static createOrder(order) {
     return new Promise((resolve, reject) => {
       firebase.post(constants.API.ORDERS.URL, order)
-      .then(response => resolve(response))
+      .then(response => resolve(response.data))
       .catch(error => reject(error));
     });
   }
