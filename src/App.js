@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { BrowserRouter } from 'react-router-dom';
+import { Route, Switch, BrowserRouter } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
@@ -11,6 +10,7 @@ import Layout from './components/Layout/Layout';
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
 import Checkout from './containers/Checkout/Checkout';
 import Orders from './containers/Orders/Orders';
+import Auth from './containers/Auth/Auth';
 
 import burgerBuilderReducer from './store/reducers/burgerBuilder';
 import orderReducer from './store/reducers/order';
@@ -34,6 +34,7 @@ class App extends Component {
             <Switch>
               <Route path='/checkout' component={Checkout} />
               <Route path='/orders' component={Orders} />
+              <Route path='/auth' component={Auth} />
               <Route path='/' component={BurgerBuilder} />
             </Switch>
           </Layout>

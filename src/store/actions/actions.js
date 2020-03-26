@@ -10,3 +10,6 @@ export const PURCHASE_INIT = 'PURCHASE_INIT';
 export const FETCH_ORDERS_START = 'FETCH_ORDERS';
 export const FETCH_ORDERS_SUCCESS = 'SET_ORDERS';
 export const SET_LOADING_STATUS = 'SET_LOADING_STATUS';
+export const AUTH_START = 'AUTH_START';
+export const AUTH_SUCCESS = 'AUTH_SUCCESS';
+export const AUTH_FAIL = 'AUTH_FAIL';
